@@ -87,6 +87,7 @@ $ns rtproto Session
 set tcp1 [new Agent/TCP/Linux]
 $ns at 0 "$tcp1 select_ca reno"
 
+# Set red color for tcp1 flow
 $tcp1 set fid_ 0
 
 $ns attach-agent $n1 $tcp1
@@ -106,6 +107,7 @@ $ftp1 attach-agent $tcp1
 #Create a UDP agent and attach it to node n0
 set udp1 [new Agent/UDP]
 
+# Set blue color for udp1 flow
 $udp1 set fid_ 1
 
 $ns attach-agent $n0 $udp1
@@ -120,6 +122,7 @@ $ns connect $udp1 $udpsink1
 #Create a UDP agent and attach it to node n4
 set udp2 [new Agent/UDP]
 
+# Set green color for cbr2 flow
 $udp2 set fid_ 2
 
 $ns attach-agent $n4 $udp2
@@ -137,16 +140,12 @@ $cbr1 set packetSize_ 500
 $cbr1 set interval_ 0.005
 $cbr1 attach-agent $udp1
 
-# Set red color for cbr1 flow
-
 
 # Create a CBR traffic source and attach it to udp2
 set cbr2 [new Application/Traffic/CBR]
 $cbr2 set packetSize_ 500
 $cbr2 set interval_ 0.005
 $cbr2 attach-agent $udp2
-
-# Set blue color for cbr2 flow
 
 
 #Schedule FTP for TCP agent
