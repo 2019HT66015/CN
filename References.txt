@@ -1,0 +1,6 @@
+installation of ns, nam, xgraph
+
+
+how to create xgraph
+
+https://www.nsnam.com/2011/08/xgraph.html
