@@ -1,6 +1,17 @@
 installation of ns, nam, xgraph
 
+https://www.isi.edu/nsnam/ns/ns-build.html
 
 how to create xgraph
 
 https://www.nsnam.com/2011/08/xgraph.html
+
+examples
+
+http://nile.wpi.edu/NS/
+
+
+setting color
+
+https://www.isi.edu/nsnam/archive/ns-users/webarch/2000/msg00530.html
+https://www.educative.io/edpresso/ns2-simulator
