@@ -3,6 +3,10 @@ set tracefile   out.tr
 
 set ns [new Simulator]
 
+$ns color 0 red
+$ns color 1 blue 
+$ns color 2 green
+
 proc monitor {interval} {
     global tcp1 ns tcpsink1
     set nowtime [$ns now]
@@ -15,9 +19,25 @@ proc monitor {interval} {
     puts $win "$nowtime $cwnd"
     $tcpsink1 set bytes_ 0
     close $win
-
+	
     $ns after $interval "monitor $interval"
+
 }
+
+#procedure to plotWindow (cwnd vs time) using xgraph using the 'result' file
+
+proc plotWindow {} {
+	global ns nf f namfile
+	$ns flush-trace
+	close $nf
+	close $f
+
+	#puts "running nam..."
+	#exec nam $namfile
+	exec xgraph result &
+	exit 0
+}
+
 
 # open trace files and enable tracing
 set nf [open $namfile w]
@@ -64,8 +84,11 @@ $ns rtproto Session
 # TcpApp needs a two-way implementation of TCP
 # TCP variant used is cubic
 
-set tcp1 [new Agent/TCP/Reno]
-#$ns at 0 "$tcp1 select ca cubic"
+set tcp1 [new Agent/TCP/Linux]
+$ns at 0 "$tcp1 select_ca reno"
+
+$tcp1 set fid_ 0
+
 $ns attach-agent $n1 $tcp1
 
 set tcpsink1 [new Agent/TCPSink]
@@ -75,12 +98,16 @@ $ns connect $tcp1 $tcpsink1
 
 #Setup a FTP over TCP connection
 set ftp1 [new Application/FTP]
+
 $ftp1 attach-agent $tcp1
 
 #Create UDP Flows between n0 and n7 and n4 and n7
 
 #Create a UDP agent and attach it to node n0
 set udp1 [new Agent/UDP]
+
+$udp1 set fid_ 1
+
 $ns attach-agent $n0 $udp1
 
 #Create a Null agent (a traffic sink) and attach it to node n7
@@ -92,6 +119,9 @@ $ns connect $udp1 $udpsink1
 
 #Create a UDP agent and attach it to node n4
 set udp2 [new Agent/UDP]
+
+$udp2 set fid_ 2
+
 $ns attach-agent $n4 $udp2
 
 #Create a Null agent (a traffic sink) and attach it to node n7
@@ -107,11 +137,16 @@ $cbr1 set packetSize_ 500
 $cbr1 set interval_ 0.005
 $cbr1 attach-agent $udp1
 
+# Set red color for cbr1 flow
+
+
 # Create a CBR traffic source and attach it to udp2
 set cbr2 [new Application/Traffic/CBR]
 $cbr2 set packetSize_ 500
 $cbr2 set interval_ 0.005
 $cbr2 attach-agent $udp2
+
+# Set blue color for cbr2 flow
 
 
 #Schedule FTP for TCP agent
@@ -126,21 +161,11 @@ $ns at 13 "$cbr1 stop"
 $ns at 8 "$cbr2 start"
 $ns at 13 "$cbr2 stop"
 
-proc finish {} {
-	global ns nf f namfile
-	$ns flush-trace
-	close $nf
-	close $f
-
-	#puts "running nam..."
-	#exec nam $namfile &
-	exit 0
-}
 
 #call the monitor at the end
 $ns at 0 "monitor 0.1"
 
-$ns at 22.0 "finish"
+$ns at 22.0 "plotWindow"
+
 
 $ns run
-
