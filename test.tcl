@@ -1,7 +1,22 @@
+##################################################################################################################
+#														 #
+# This script was created as part of ACN ASSIGNMENT1 for BITS WILP COURSE - Advanced Computer Networks (CS ZG525)#
+#														 #
+# Author: BASKAR BALASUBRAMANIAN BITS ID: 2019HT66015@wilp.bits-pilani.ac.in 					 #
+#														 #
+# Code is available in GitHub location: https://github.com/2019HT66015/CN/tree/ACN_ns_assignment_tcp 		 #
+#														 #
+##################################################################################################################
+
 set namfile     out.nam
 set tracefile   out.tr
 
 set ns [new Simulator]
+
+# Set the TCP Variant details here (cubic or reno)
+set TCP_Variant "Agent/TCP/Linux"
+set TCP_Name "cubic"
+#set TCP_Name "reno"
 
 $ns color 0 red
 $ns color 1 blue 
@@ -32,9 +47,15 @@ proc plotWindow {} {
 	close $nf
 	close $f
 
-	#puts "running nam..."
-	#exec nam $namfile
+	puts "running nam..."
+	exec nam $namfile
 	exec xgraph result &
+
+# Code to count the number of dropped packets in tcp flow (Commented now)
+
+	#puts "Number of dropped packets for the tcp flow"
+	#exec gawk -f get_drop_packets.awk out.tr &
+
 	exit 0
 }
 
@@ -84,9 +105,13 @@ $ns rtproto Session
 # TcpApp needs a two-way implementation of TCP
 # TCP variant used is cubic
 
-set tcp1 [new Agent/TCP/Linux]
-$ns at 0 "$tcp1 select_ca reno"
+set tcp1 [new $TCP_Variant]
 
+
+$ns at 0 "$tcp1 select_ca $TCP_Name"
+#$ns at 0 "$tcp1 select_ca cubic"
+
+# Set red color for tcp1 flow
 $tcp1 set fid_ 0
 
 $ns attach-agent $n1 $tcp1
@@ -106,6 +131,7 @@ $ftp1 attach-agent $tcp1
 #Create a UDP agent and attach it to node n0
 set udp1 [new Agent/UDP]
 
+# Set blue color for udp1 flow
 $udp1 set fid_ 1
 
 $ns attach-agent $n0 $udp1
@@ -120,6 +146,7 @@ $ns connect $udp1 $udpsink1
 #Create a UDP agent and attach it to node n4
 set udp2 [new Agent/UDP]
 
+# Set green color for cbr2 flow
 $udp2 set fid_ 2
 
 $ns attach-agent $n4 $udp2
@@ -137,16 +164,12 @@ $cbr1 set packetSize_ 500
 $cbr1 set interval_ 0.005
 $cbr1 attach-agent $udp1
 
-# Set red color for cbr1 flow
-
 
 # Create a CBR traffic source and attach it to udp2
 set cbr2 [new Application/Traffic/CBR]
 $cbr2 set packetSize_ 500
 $cbr2 set interval_ 0.005
 $cbr2 attach-agent $udp2
-
-# Set blue color for cbr2 flow
 
 
 #Schedule FTP for TCP agent

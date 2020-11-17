@@ -15,3 +15,7 @@ setting color
 
 https://www.isi.edu/nsnam/archive/ns-users/webarch/2000/msg00530.html
 https://www.educative.io/edpresso/ns2-simulator
+
+Using awk to obtain data from ns trace files
+
+https://www.nsnam.com/2013/03/awk-scripts-for-ns2-to-process-data.html

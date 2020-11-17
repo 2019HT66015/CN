@@ -1,0 +1,52 @@
+
+   1: BEGIN {
+   2: seqno = -1; 
+   3: droppedPackets = 0;
+   4: receivedPackets = 0;
+   5: count = 0;
+   6: }
+   7: {
+   8: #packet delivery ratio
+   9: if($4 == "AGT" &;& $1 == "s" && seqno < $6) {
+  10: seqno = $6;
+  11: } else if(($4 == "AGT") && ($1 == "r")) {
+  12: receivedPackets++;
+  13: } else if ($1 == "D" && $7 == "tcp" && $8 > 512){
+  14: droppedPackets++; 
+  15: }
+  16: #end-to-end delay
+  17: if($4 == "AGT" &;& $1 == "s") {
+  18: start_time[$6] = $2;
+  19: } else if(($7 == "tcp") && ($1 == "r")) {
+  20: end_time[$6] = $2;
+  21: } else if($1 == "D" && $7 == "tcp") {
+  22: end_time[$6] = -1;
+  23: }
+  24: }
+  25:  
+  26: END { 
+  27: for(i=0; i<=seqno; i++) {
+  28: if(end_time[i] >; 0) {
+  29: delay[i] = end_time[i] - start_time[i];
+  30: count++;
+  31: }
+  32: else
+  33: {
+  34: delay[i] = -1;
+  35: }
+  36: }
+  37: for(i=0; i<count; i++) {
+  38: if(delay[i] >; 0) {
+  39: n_to_n_delay = n_to_n_delay + delay[i];
+  40: } 
+  41: }
+  42: n_to_n_delay = n_to_n_delay/count;
+  43: print "\n";
+  44: print "GeneratedPackets = " seqno+1;
+  45: print "ReceivedPackets = " receivedPackets;
+  46: print "Packet Delivery Ratio = " receivedPackets/(seqno+1)*100
+  47: "%";
+  48: print "Total Dropped Packets = " droppedPackets;
+  49: print "Average End-to-End Delay = " n_to_n_delay * 1000 " ms";
+  50: print "\n";
+  51: }
