@@ -1,7 +1,25 @@
+##################################################################################################################
+#														 #
+# This script was created as part of ACN ASSIGNMENT1 for BITS WILP COURSE - Advanced Computer Networks (CS ZG525)#
+#														 #
+# Author: BASKAR BALASUBRAMANIAN BITS ID: 2019HT66015@wilp.bits-pilani.ac.in 					 #
+#														 #
+# Code is available in GitHub location: https://github.com/2019HT66015/CN/tree/ACN_ns_assignment_tcp 		 #
+#														 #
+##################################################################################################################
+
+# nam trace file and ns tracefiles are defined here
 set namfile     out.nam
 set tracefile   out.tr
 
 set ns [new Simulator]
+
+# Set the TCP Variant details here (For this assignment it was set to either cubic or reno)
+set TCP_Variant "Agent/TCP/Linux"
+set TCP_Name "cubic"
+#set TCP_Name "reno"
+
+set MSS 1448
 
 $ns color 0 red
 $ns color 1 blue 
@@ -24,7 +42,8 @@ proc monitor {interval} {
 
 }
 
-#procedure to plotWindow (cwnd vs time) using xgraph using the 'result' file
+#Usually this procedure is named as finish. For this assignment it has been renamed as plotWindow, since it also performs plotWindow (cwnd vs time) using xgraph. 
+#There is also the code that would count the number of dropped packets in the tcp flow. It has been commented in the code. 
 
 proc plotWindow {} {
 	global ns nf f namfile
@@ -32,9 +51,15 @@ proc plotWindow {} {
 	close $nf
 	close $f
 
-	#puts "running nam..."
+	puts "running nam..."
 	#exec nam $namfile
-	exec xgraph result &
+	exec xgraph -bg green -fg blue result -t "TCP cwnd" -x "time (milli seconds)" -y "cwnd size (bytes)" -geometry 800x400 &
+
+# Code to count the number of dropped packets in tcp flow (Commented now)
+
+	#puts "Number of dropped packets for the tcp flow"
+	#exec gawk -f get_drop_packets.awk out.tr &
+
 	exit 0
 }
 
@@ -84,8 +109,11 @@ $ns rtproto Session
 # TcpApp needs a two-way implementation of TCP
 # TCP variant used is cubic
 
-set tcp1 [new Agent/TCP/Linux]
-$ns at 0 "$tcp1 select_ca reno"
+set tcp1 [new $TCP_Variant]
+
+$ns at 0 "$tcp1 select_ca $TCP_Name"
+
+$tcp1 set packetSize_ $MSS
 
 # Set red color for tcp1 flow
 $tcp1 set fid_ 0
@@ -153,12 +181,30 @@ $ns at 0 "$ftp1 start"
 $ns at 19 "$ftp1 stop"
 
 #Schedule events for the CBR agent
-$ns at 8 "$cbr1 start"
-$ns at 13 "$cbr1 stop"
+#run1
+#$ns at 8 "$cbr1 start"
+#$ns at 13 "$cbr1 stop"
+
+#run2
+#$ns at 0 "$cbr1 start"
+#$ns at 13 "$cbr1 stop"
+
+#run3
+$ns at 0 "$cbr1 start"
+$ns at 12 "$cbr1 stop"
 
 #Schedule events for the CBR agent
-$ns at 8 "$cbr2 start"
-$ns at 13 "$cbr2 stop"
+#run1
+#$ns at 8 "$cbr2 start"
+#$ns at 13 "$cbr2 stop"
+
+#run2
+#$ns at 0 "$cbr2 start"
+#$ns at 13 "$cbr2 stop"
+
+#run3
+$ns at 10 "$cbr2 start"
+$ns at 19 "$cbr2 stop"
 
 
 #call the monitor at the end
