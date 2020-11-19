@@ -16,8 +16,8 @@ set ns [new Simulator]
 
 # Set the TCP Variant details here (For this assignment it was set to either cubic or reno)
 set TCP_Variant "Agent/TCP/Linux"
-set TCP_Name "cubic"
-#set TCP_Name "reno"
+#set TCP_Name "cubic"
+set TCP_Name "reno"
 
 set MSS 1448
 
@@ -53,7 +53,13 @@ proc plotWindow {} {
 
 	puts "running nam..."
 	#exec nam $namfile
-	exec xgraph -bg green -fg blue result -t "TCP cwnd" -x "time (milli seconds)" -y "cwnd size (bytes)" -geometry 800x400 &
+
+#	Plotting the xgraph with the result file
+	exec cp result congestionReno.xg
+#	exec cp result congestionCubic.xg
+
+	exec xgraph -bg green -fg blue congestionReno.xg -t "TCP cwnd" -x "time (milli seconds)" -y "cwnd size (bytes)" -geometry 800x400 &
+#	exec xgraph -bg green -fg blue congestionCubic.xg -t "TCP cwnd" -x "time (milli seconds)" -y "cwnd size (bytes)" -geometry 800x400 &
 
 # Code to count the number of dropped packets in tcp flow (Commented now)
 
@@ -182,29 +188,29 @@ $ns at 19 "$ftp1 stop"
 
 #Schedule events for the CBR agent
 #run1
-#$ns at 8 "$cbr1 start"
-#$ns at 13 "$cbr1 stop"
+$ns at 8 "$cbr1 start"
+$ns at 13 "$cbr1 stop"
 
 #run2
 #$ns at 0 "$cbr1 start"
 #$ns at 13 "$cbr1 stop"
 
 #run3
-$ns at 0 "$cbr1 start"
-$ns at 12 "$cbr1 stop"
+#$ns at 0 "$cbr1 start"
+#$ns at 12 "$cbr1 stop"
 
 #Schedule events for the CBR agent
 #run1
-#$ns at 8 "$cbr2 start"
-#$ns at 13 "$cbr2 stop"
+$ns at 8 "$cbr2 start"
+$ns at 13 "$cbr2 stop"
 
 #run2
 #$ns at 0 "$cbr2 start"
 #$ns at 13 "$cbr2 stop"
 
 #run3
-$ns at 10 "$cbr2 start"
-$ns at 19 "$cbr2 stop"
+#$ns at 10 "$cbr2 start"
+#$ns at 19 "$cbr2 stop"
 
 
 #call the monitor at the end
